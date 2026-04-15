@@ -1,0 +1,16 @@
+---
+title: "Yiwei Zhang"
+image: "files/profile_pic.png"
+about:
+  template: jolla
+  links:
+    - icon: envelope
+      href: mailto:yiz223@ucsd.edu
+    - icon: linkedin
+      href: https://www.linkedin.com/in/yiwei-z-5909162a6
+---
+
+Welcome to my website!
+I'm a student at UCSD passionate about marketing, data, and business analytics.
+
+To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
