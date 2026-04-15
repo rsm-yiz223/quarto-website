@@ -16,5 +16,8 @@
   },
   "projects/project2/index.qmd": {
     "index.html": "6437a149"
+  },
+  "projects/ab-testing/index.qmd": {
+    "index.html": "93101a15"
   }
 }
