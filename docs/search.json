@@ -102,6 +102,62 @@
     "href": "projects.html",
     "title": "My Projects",
     "section": "",
-    "text": "A/B Testing a Call to Action\n\n\n\n\n\n\nYiwei Zhang\n\n\nApr 15, 2026\n\n\n\n\n\n\n\n\n\n\n\nAnalysis of Cars\n\n\n\n\n\n\nYiwei Zhang\n\n\nApr 15, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items"
+    "text": "A/B Testing a Call to Action\n\n\n\n\n\n\nYiwei Zhang\n\n\nApr 15, 2026\n\n\n\n\n\n\n\n\n\n\n\nAnalysis of Cars\n\n\n\n\n\n\nYiwei Zhang\n\n\nApr 22, 2026\n\n\n\n\n\n\n\n\n\n\n\nReplication: Karlan & List (2007)\n\n\n\n\n\n\nYiwei Zhang\n\n\nApr 21, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "projects/hw2/hw2_karlan_list.html",
+    "href": "projects/hw2/hw2_karlan_list.html",
+    "title": "Replication: Karlan & List (2007)",
+    "section": "",
+    "text": "Karlan and List (2007) study whether matching grants increase charitable giving in a large-scale natural field experiment. The authors partnered with a nonprofit organization and mailed donation solicitations to prior donors. Some donors were randomly assigned to a control group, while others received a matching offer. Within the treatment group, the authors also randomized the match ratio, the size threshold of the match, and the example donation amount. The paper asks whether lowering the effective “price” of giving through a matching grant changes donor behavior.\nThis is a causal research design because treatment was randomly assigned. If randomization worked, then treatment and control groups should look similar before the intervention, and any later differences in donations can be interpreted as causal effects of the matching offer."
+  },
+  {
+    "objectID": "projects/hw2/hw2_karlan_list.html#introduction",
+    "href": "projects/hw2/hw2_karlan_list.html#introduction",
+    "title": "Replication: Karlan & List (2007)",
+    "section": "",
+    "text": "Karlan and List (2007) study whether matching grants increase charitable giving in a large-scale natural field experiment. The authors partnered with a nonprofit organization and mailed donation solicitations to prior donors. Some donors were randomly assigned to a control group, while others received a matching offer. Within the treatment group, the authors also randomized the match ratio, the size threshold of the match, and the example donation amount. The paper asks whether lowering the effective “price” of giving through a matching grant changes donor behavior.\nThis is a causal research design because treatment was randomly assigned. If randomization worked, then treatment and control groups should look similar before the intervention, and any later differences in donations can be interpreted as causal effects of the matching offer."
+  },
+  {
+    "objectID": "projects/hw2/hw2_karlan_list.html#main-analysis",
+    "href": "projects/hw2/hw2_karlan_list.html#main-analysis",
+    "title": "Replication: Karlan & List (2007)",
+    "section": "Main Analysis",
+    "text": "Main Analysis"
+  },
+  {
+    "objectID": "projects/hw2/hw2_karlan_list.html#something-additional",
+    "href": "projects/hw2/hw2_karlan_list.html#something-additional",
+    "title": "Replication: Karlan & List (2007)",
+    "section": "Something Additional",
+    "text": "Something Additional\nThis paper supports a causal interpretation because treatment was randomly assigned. Since the treatment and control groups are balanced on observable characteristics, differences in donation outcomes after the mailing can be interpreted as causal effects of the matching offer rather than simple correlations.\nAn additional insight from the results is that offering a match appears to matter more than increasing the generosity of the match ratio itself. The results show that while the presence of a matching grant increases giving, larger match ratios (such as 2:1 or 3:1) do not generate much additional effect compared to a 1:1 match."
+  },
+  {
+    "objectID": "projects/hw2/hw2_karlan_list.html#load-data",
+    "href": "projects/hw2/hw2_karlan_list.html#load-data",
+    "title": "Replication: Karlan & List (2007)",
+    "section": "Load Data",
+    "text": "Load Data\n\nimport pandas as pd\nimport numpy as np\nimport statsmodels.api as sm\n\ndf = pd.read_stata(\"113224-V1/AERtables1-5.dta\")\ndf.shape\n\n(50130, 35)"
+  },
+  {
+    "objectID": "projects/hw2/hw2_karlan_list.html#replication-of-table-1",
+    "href": "projects/hw2/hw2_karlan_list.html#replication-of-table-1",
+    "title": "Replication: Karlan & List (2007)",
+    "section": "Replication of Table 1",
+    "text": "Replication of Table 1\nTable 1 checks whether the treatment and control groups are balanced on observable characteristics.\n\ntable1_vars = [\n    \"MRM2\",\n    \"HPA\",\n    \"freq\",\n    \"years\",\n    \"dormant\",\n    \"female\",\n    \"couple\",\n    \"red0\",\n    \"redcty\",\n    \"nonlit\",\n    \"cases\"\n]\n\nrow_names = [\n    \"Months since last donation\",\n    \"Highest previous contribution\",\n    \"Number of prior donations\",\n    \"Years since initial donation\",\n    \"Already donated in 2005\",\n    \"Female\",\n    \"Couple\",\n    \"Red state\",\n    \"Red county\",\n    \"Nonlitigation\",\n    \"Cases\"\n]\n\ndef mean_sd(series):\n    return f\"{series.mean():.3f} ({series.std():.3f})\"\n\ntable1 = pd.DataFrame({\n    \"All\": [mean_sd(df[v]) for v in table1_vars],\n    \"Treatment\": [mean_sd(df.loc[df[\"treatment\"] == 1, v]) for v in table1_vars],\n    \"Control\": [mean_sd(df.loc[df[\"control\"] == 1, v]) for v in table1_vars],\n}, index=row_names)\n\ntable1\n\n\n\n\n\n\n\n\nAll\nTreatment\nControl\n\n\n\n\nMonths since last donation\n13.007 (12.081)\n13.012 (12.086)\n12.998 (12.074)\n\n\nHighest previous contribution\n59.385 (71.177)\n59.597 (73.052)\n58.960 (67.269)\n\n\nNumber of prior donations\n8.039 (11.394)\n8.035 (11.390)\n8.047 (11.404)\n\n\nYears since initial donation\n6.098 (5.503)\n6.078 (5.442)\n6.136 (5.625)\n\n\nAlready donated in 2005\n0.523 (0.499)\n0.524 (0.499)\n0.523 (0.499)\n\n\nFemale\n0.278 (0.448)\n0.275 (0.447)\n0.283 (0.450)\n\n\nCouple\n0.092 (0.289)\n0.091 (0.288)\n0.093 (0.290)\n\n\nRed state\n0.404 (0.491)\n0.407 (0.491)\n0.399 (0.490)\n\n\nRed county\n0.510 (0.500)\n0.512 (0.500)\n0.507 (0.500)\n\n\nNonlitigation\n2.474 (1.962)\n2.485 (1.966)\n2.453 (1.953)\n\n\nCases\n1.500 (1.155)\n1.499 (1.157)\n1.502 (1.152)\n\n\n\n\n\n\n\nThe treatment and control groups are very similar across observable characteristics, which suggests that randomization was successful."
+  },
+  {
+    "objectID": "projects/hw2/hw2_karlan_list.html#replication-of-table-2a-panel-a",
+    "href": "projects/hw2/hw2_karlan_list.html#replication-of-table-2a-panel-a",
+    "title": "Replication: Karlan & List (2007)",
+    "section": "Replication of Table 2A, Panel A",
+    "text": "Replication of Table 2A, Panel A\nTable 2A Panel A reports the main response outcomes.\n\ndef mean_se(series):\n    mean = series.mean()\n    se = series.std(ddof=1) / np.sqrt(series.notna().sum())\n    return f\"{mean:.3f} ({se:.3f})\"\n\ngroups = {\n    \"Control\": df[\"control\"] == 1,\n    \"Treatment\": df[\"treatment\"] == 1,\n    \"1:1\": df[\"ratio\"] == 1,\n    \"2:1\": df[\"ratio\"] == 2,\n    \"3:1\": df[\"ratio\"] == 3\n}\n\nrows = []\n\nfor g, cond in groups.items():\n    rows.append({\n        \"Group\": g,\n        \"Response rate\": mean_se(df.loc[cond, \"gave\"]),\n        \"Dollars given, unconditional\": mean_se(df.loc[cond, \"amount\"]),\n        \"Dollars given, conditional on giving\": mean_se(df.loc[cond & (df[\"gave\"] == 1), \"amount\"]),\n        \"Observations\": int(cond.sum())\n    })\n\ntable2a = pd.DataFrame(rows)\ntable2a\n\n\n\n\n\n\n\n\nGroup\nResponse rate\nDollars given, unconditional\nDollars given, conditional on giving\nObservations\n\n\n\n\n0\nControl\n0.018 (0.001)\n0.813 (0.063)\n45.540 (2.397)\n16687\n\n\n1\nTreatment\n0.022 (0.001)\n0.967 (0.049)\n43.872 (1.549)\n33396\n\n\n2\n1:1\n0.021 (0.001)\n0.937 (0.089)\n45.143 (3.099)\n11133\n\n\n3\n2:1\n0.023 (0.001)\n1.026 (0.089)\n45.337 (2.725)\n11134\n\n\n4\n3:1\n0.023 (0.001)\n0.938 (0.077)\n41.252 (2.222)\n11129\n\n\n\n\n\n\n\nThe results should show that the matching treatment increases both response rate and dollars raised per solicitation."
+  },
+  {
+    "objectID": "projects/hw2/hw2_karlan_list.html#replication-of-table-3-column-1",
+    "href": "projects/hw2/hw2_karlan_list.html#replication-of-table-3-column-1",
+    "title": "Replication: Karlan & List (2007)",
+    "section": "Replication of Table 3, Column 1",
+    "text": "Replication of Table 3, Column 1\nI replicate the simplest specification from Table 3, where the dependent variable is whether the donor gave and the only regressor is treatment.\n\nreg_df = df[[\"gave\", \"treatment\"]].dropna().copy()\n\ny = reg_df[\"gave\"]\nX = sm.add_constant(reg_df[[\"treatment\"]])\n\nmodel1 = sm.OLS(y, X).fit(cov_type=\"HC1\")\nmodel1.summary()\n\n\nOLS Regression Results\n\n\nDep. Variable:\ngave\nR-squared:\n0.000\n\n\nModel:\nOLS\nAdj. R-squared:\n0.000\n\n\nMethod:\nLeast Squares\nF-statistic:\n10.30\n\n\nDate:\nWed, 22 Apr 2026\nProb (F-statistic):\n0.00133\n\n\nTime:\n22:40:17\nLog-Likelihood:\n26630.\n\n\nNo. Observations:\n50083\nAIC:\n-5.326e+04\n\n\nDf Residuals:\n50081\nBIC:\n-5.324e+04\n\n\nDf Model:\n1\n\n\n\n\nCovariance Type:\nHC1\n\n\n\n\n\n\n\n\n\n\n\ncoef\nstd err\nz\nP&gt;|z|\n[0.025\n0.975]\n\n\nconst\n0.0179\n0.001\n17.419\n0.000\n0.016\n0.020\n\n\ntreatment\n0.0042\n0.001\n3.209\n0.001\n0.002\n0.007\n\n\n\n\n\n\n\n\nOmnibus:\n59814.280\nDurbin-Watson:\n1.997\n\n\nProb(Omnibus):\n0.000\nJarque-Bera (JB):\n4317152.727\n\n\nSkew:\n6.740\nProb(JB):\n0.00\n\n\nKurtosis:\n46.440\nCond. No.\n3.23\n\n\n\nNotes:[1] Standard Errors are heteroscedasticity robust (HC1)\n\n\nThe coefficient on treatment should be close to 0.004, meaning that the matching offer increases the probability of donating by about 0.4 percentage points."
   }
 ]

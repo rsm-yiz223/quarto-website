@@ -1,0 +1,132 @@
+---
+title: "Replication: Karlan & List (2007)"
+subtitle: "Does Price Matter in Charitable Giving?"
+author: "Yiwei Zhang"
+date: Apr-21-2026
+---
+
+
+## Introduction
+
+Karlan and List (2007) study whether matching grants increase charitable giving in a large-scale natural field experiment. The authors partnered with a nonprofit organization and mailed donation solicitations to prior donors. Some donors were randomly assigned to a control group, while others received a matching offer. Within the treatment group, the authors also randomized the match ratio, the size threshold of the match, and the example donation amount. The paper asks whether lowering the effective “price” of giving through a matching grant changes donor behavior.
+
+This is a causal research design because treatment was randomly assigned. If randomization worked, then treatment and control groups should look similar before the intervention, and any later differences in donations can be interpreted as causal effects of the matching offer.
+
+
+## Main Analysis
+
+## Load Data
+
+```{python}
+import pandas as pd
+import numpy as np
+import statsmodels.api as sm
+
+df = pd.read_stata("113224-V1/AERtables1-5.dta")
+df.shape
+```
+
+## Replication of Table 1
+
+Table 1 checks whether the treatment and control groups are balanced on observable characteristics.
+
+```{python}
+table1_vars = [
+    "MRM2",
+    "HPA",
+    "freq",
+    "years",
+    "dormant",
+    "female",
+    "couple",
+    "red0",
+    "redcty",
+    "nonlit",
+    "cases"
+]
+
+row_names = [
+    "Months since last donation",
+    "Highest previous contribution",
+    "Number of prior donations",
+    "Years since initial donation",
+    "Already donated in 2005",
+    "Female",
+    "Couple",
+    "Red state",
+    "Red county",
+    "Nonlitigation",
+    "Cases"
+]
+
+def mean_sd(series):
+    return f"{series.mean():.3f} ({series.std():.3f})"
+
+table1 = pd.DataFrame({
+    "All": [mean_sd(df[v]) for v in table1_vars],
+    "Treatment": [mean_sd(df.loc[df["treatment"] == 1, v]) for v in table1_vars],
+    "Control": [mean_sd(df.loc[df["control"] == 1, v]) for v in table1_vars],
+}, index=row_names)
+
+table1
+```
+
+The treatment and control groups are very similar across observable characteristics, which suggests that randomization was successful.
+
+## Replication of Table 2A, Panel A
+
+Table 2A Panel A reports the main response outcomes.
+
+```{python}
+def mean_se(series):
+    mean = series.mean()
+    se = series.std(ddof=1) / np.sqrt(series.notna().sum())
+    return f"{mean:.3f} ({se:.3f})"
+
+groups = {
+    "Control": df["control"] == 1,
+    "Treatment": df["treatment"] == 1,
+    "1:1": df["ratio"] == 1,
+    "2:1": df["ratio"] == 2,
+    "3:1": df["ratio"] == 3
+}
+
+rows = []
+
+for g, cond in groups.items():
+    rows.append({
+        "Group": g,
+        "Response rate": mean_se(df.loc[cond, "gave"]),
+        "Dollars given, unconditional": mean_se(df.loc[cond, "amount"]),
+        "Dollars given, conditional on giving": mean_se(df.loc[cond & (df["gave"] == 1), "amount"]),
+        "Observations": int(cond.sum())
+    })
+
+table2a = pd.DataFrame(rows)
+table2a
+```
+
+The results should show that the matching treatment increases both response rate and dollars raised per solicitation.
+
+
+## Replication of Table 3, Column 1
+
+I replicate the simplest specification from Table 3, where the dependent variable is whether the donor gave and the only regressor is treatment.
+
+```{python}
+reg_df = df[["gave", "treatment"]].dropna().copy()
+
+y = reg_df["gave"]
+X = sm.add_constant(reg_df[["treatment"]])
+
+model1 = sm.OLS(y, X).fit(cov_type="HC1")
+model1.summary()
+```
+
+The coefficient on `treatment` should be close to 0.004, meaning that the matching offer increases the probability of donating by about 0.4 percentage points.
+
+## Something Additional
+
+This paper supports a causal interpretation because treatment was randomly assigned. Since the treatment and control groups are balanced on observable characteristics, differences in donation outcomes after the mailing can be interpreted as causal effects of the matching offer rather than simple correlations.
+
+An additional insight from the results is that offering a match appears to matter more than increasing the generosity of the match ratio itself. The results show that while the presence of a matching grant increases giving, larger match ratios (such as 2:1 or 3:1) do not generate much additional effect compared to a 1:1 match.

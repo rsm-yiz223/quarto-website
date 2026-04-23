@@ -19,5 +19,8 @@
   },
   "projects/ab-testing/index.qmd": {
     "index.html": "93101a15"
+  },
+  "projects/hw2/hw2_karlan_list.qmd": {
+    "hw2_karlan_list.html": "9c41212b"
   }
 }
