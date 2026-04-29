@@ -2,16 +2,14 @@
 title: "Replication: Karlan & List (2007)"
 subtitle: "Does Price Matter in Charitable Giving?"
 author: "Yiwei Zhang"
-date: Apr-21-2026
+date: "2026-04-21"
 ---
-
 
 ## Introduction
 
 Karlan and List (2007) study whether matching grants increase charitable giving in a large-scale natural field experiment. The authors partnered with a nonprofit organization and mailed donation solicitations to prior donors. Some donors were randomly assigned to a control group, while others received a matching offer. Within the treatment group, the authors also randomized the match ratio, the size threshold of the match, and the example donation amount. The paper asks whether lowering the effective “price” of giving through a matching grant changes donor behavior.
 
 This is a causal research design because treatment was randomly assigned. If randomization worked, then treatment and control groups should look similar before the intervention, and any later differences in donations can be interpreted as causal effects of the matching offer.
-
 
 ## Main Analysis
 
@@ -21,6 +19,7 @@ This is a causal research design because treatment was randomly assigned. If ran
 import pandas as pd
 import numpy as np
 import statsmodels.api as sm
+import matplotlib.pyplot as plt
 
 df = pd.read_stata("113224-V1/AERtables1-5.dta")
 df.shape
@@ -106,7 +105,88 @@ table2a = pd.DataFrame(rows)
 table2a
 ```
 
-The results should show that the matching treatment increases both response rate and dollars raised per solicitation.
+The replicated results indicate that the matching treatment increases both the response rate and the amount raised per solicitation.
+
+## Visual Summary of Main Outcomes
+
+To make the treatment effects easier to interpret, the figures below summarize the most important outcome differences across groups.
+
+Treatment vs. Control
+```{python}
+tc_summary = pd.DataFrame({
+    "Group": ["Control", "Treatment"],
+    "Response Rate": [
+        df.loc[df["control"] == 1, "gave"].mean(),
+        df.loc[df["treatment"] == 1, "gave"].mean()
+    ],
+    "Average Donation": [
+        df.loc[df["control"] == 1, "amount"].mean(),
+        df.loc[df["treatment"] == 1, "amount"].mean()
+    ],
+    "Average Donation Among Donors": [
+        df.loc[(df["control"] == 1) & (df["gave"] == 1), "amount"].mean(),
+        df.loc[(df["treatment"] == 1) & (df["gave"] == 1), "amount"].mean()
+    ]
+})
+
+tc_summary
+```
+```{python}
+fig, ax = plt.subplots(figsize=(8, 5))
+bars = ax.bar(tc_summary["Group"], tc_summary["Response Rate"])
+ax.set_title("Response Rate: Treatment vs. Control")
+ax.set_ylabel("Share Donating")
+ax.set_xlabel("Group")
+ax.set_ylim(0, tc_summary["Response Rate"].max() * 1.25)
+
+for bar in bars:
+    height = bar.get_height()
+    ax.text(bar.get_x() + bar.get_width() / 2, height + 0.001,
+            f"{height:.3f}", ha="center", va="bottom")
+
+plt.tight_layout()
+plt.show()
+```
+
+The first figure shows that individuals in the treatment group were slightly more likely to donate than those in the control group.
+
+```{python}
+fig, ax = plt.subplots(figsize=(8, 5))
+bars = ax.bar(tc_summary["Group"], tc_summary["Average Donation"])
+ax.set_title("Average Donation per Solicitation: Treatment vs. Control")
+ax.set_ylabel("Average Donation Amount")
+ax.set_xlabel("Group")
+ax.set_ylim(0, tc_summary["Average Donation"].max() * 1.25)
+
+for bar in bars:
+    height = bar.get_height()
+    ax.text(bar.get_x() + bar.get_width() / 2, height + 0.02,
+            f"{height:.2f}", ha="center", va="bottom")
+
+plt.tight_layout()
+plt.show()
+```
+
+This second figure shows that the matching offer also raised the average amount donated per solicitation.
+
+```{python}
+fig, ax = plt.subplots(figsize=(8, 5))
+bars = ax.bar(tc_summary["Group"], tc_summary["Average Donation Among Donors"])
+ax.set_title("Average Donation Among Donors Only")
+ax.set_ylabel("Conditional Mean Donation")
+ax.set_xlabel("Group")
+ax.set_ylim(0, tc_summary["Average Donation Among Donors"].max() * 1.25)
+
+for bar in bars:
+    height = bar.get_height()
+    ax.text(bar.get_x() + bar.get_width() / 2, height + 0.1,
+            f"{height:.2f}", ha="center", va="bottom")
+
+plt.tight_layout()
+plt.show()
+```
+
+Conditional on giving, donation amounts are fairly similar across groups, which is consistent with the paper’s finding that the main effect comes from getting more people to respond rather than dramatically increasing gift size among existing donors.
 
 
 ## Replication of Table 3, Column 1
@@ -123,9 +203,9 @@ model1 = sm.OLS(y, X).fit(cov_type="HC1")
 model1.summary()
 ```
 
-The coefficient on `treatment` should be close to 0.004, meaning that the matching offer increases the probability of donating by about 0.4 percentage points.
+The coefficient on `treatment` is close to 0.004, suggesting that the matching offer increases the probability of donating by about 0.4 percentage points.
 
-## Something Additional
+## Additional Discussion
 
 This paper supports a causal interpretation because treatment was randomly assigned. Since the treatment and control groups are balanced on observable characteristics, differences in donation outcomes after the mailing can be interpreted as causal effects of the matching offer rather than simple correlations.
 
