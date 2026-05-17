@@ -1,16 +1,17 @@
 ---
 title: "Poisson Regression and Maximum Likelihood Estimation"
 subtitle: "A Case Study of Blueprinty's Software and Patent Awards"
-author: "Yiwei Zhang"
-date: May 15 2026
+author: "Yvette"
+date: today
 format:
   html:
     toc: true
     toc-depth: 2
     code-fold: false
-    fig-width: 9
-    fig-height: 4.5
-    fig-dpi: 130
+    fig-width: 7
+    fig-height: 3.8
+    fig-dpi: 140
+    fig-align: center
     embed-resources: true
     theme: cosmo
     df-print: paged
@@ -79,7 +80,7 @@ The catch is that Blueprinty's customers were not picked at random. Firms self-s
 mean_non = df.loc[df.iscustomer == 0, "patents"].mean()
 mean_cus = df.loc[df.iscustomer == 1, "patents"].mean()
 
-fig, axes = plt.subplots(1, 2, figsize=(10, 4), sharey=True)
+fig, axes = plt.subplots(1, 2, figsize=(7.5, 3.5), sharey=True)
 xmax = df.patents.max() + 1
 bins = np.arange(0, xmax + 1) - 0.5
 
@@ -120,7 +121,7 @@ region_tab = (pd.crosstab(df.region, df.iscustomer, normalize="columns") * 100)
 region_tab.columns = ["Non-customer", "Customer"]
 region_tab = region_tab.sort_values("Customer", ascending=True)
 
-fig, ax = plt.subplots(figsize=(8, 4))
+fig, ax = plt.subplots(figsize=(7, 3.8))
 y = np.arange(len(region_tab))
 ax.barh(y - 0.2, region_tab["Non-customer"], height=0.4,
         color=C_NONCUSTOMER, label="Non-customer")
@@ -149,7 +150,7 @@ The regional split is striking. Roughly **68%** of Blueprinty's customers are in
 age_non = df.loc[df.iscustomer == 0, "age"]
 age_cus = df.loc[df.iscustomer == 1, "age"]
 
-fig, ax = plt.subplots(figsize=(9, 4))
+fig, ax = plt.subplots(figsize=(7.5, 3.5))
 bins = np.arange(0, df.age.max() + 2, 2)
 ax.hist(age_non, bins=bins, color=C_NONCUSTOMER, alpha=0.65,
         edgecolor="white", label=f"Non-customer (mean {age_non.mean():.1f})")
@@ -171,6 +172,7 @@ The takeaway from this exploration: **customers and non-customers differ systema
 
 
 ## A Simple Poisson Model via Maximum Likelihood
+
 The outcome we care about is a count: the number of patents awarded to a firm over five years. Counts can't be negative and have to be whole numbers, so a Normal distribution isn't the natural choice. The textbook starting point for non-negative integer outcomes is the **Poisson distribution**, which has a single rate parameter $\lambda > 0$ controlling both its mean *and* its variance.
 
 ### Deriving the likelihood
@@ -228,7 +230,7 @@ Y = df.patents.values
 lam_grid = np.linspace(0.5, 8, 400)
 ll = np.array([poisson_loglikelihood(l, Y) for l in lam_grid])
 
-fig, ax = plt.subplots(figsize=(8.5, 4.5))
+fig, ax = plt.subplots(figsize=(7, 3.8))
 ax.plot(lam_grid, ll, color=C_ACCENT, linewidth=2.5)
 ax.axvline(Y.mean(), color=C_CUSTOMER, linestyle="--", linewidth=1.6,
            label=f"Sample mean = MLE = {Y.mean():.3f}")
@@ -266,6 +268,7 @@ The two agree to six decimal places, which is exactly what we expect — the opt
 
 
 ## Poisson Regression
+
 The one-parameter model assumes **every firm has the same patent rate**. That's clearly wrong: a 40-year-old firm in the Northeast that uses Blueprinty's software almost certainly faces a different rate than a 15-year-old non-customer in the South. To let the rate vary across firms, we replace the scalar $\lambda$ with a firm-specific $\lambda_i$ that depends on covariates:
 
 $$
@@ -389,7 +392,7 @@ interp = pd.DataFrame({
     "Variable":   X_df.columns,
     "β̂":          beta_hat,
     "exp(β̂)":     np.exp(beta_hat),
-    "Significant (|z|>1.96)": ["✓" if abs(b/s) > 1.96 else "" for b, s in zip(beta_hat, se_hat)],
+    "Significant (z > 1.96)": ["✓" if abs(b/s) > 1.96 else "" for b, s in zip(beta_hat, se_hat)],
 })
 Markdown(interp.to_markdown(index=False,
                             floatfmt=("", "+.4f", ".4f", "")))
@@ -401,6 +404,7 @@ Markdown(interp.to_markdown(index=False,
 
 
 ## The Effect of Blueprinty's Software
+
 A 23% multiplicative effect is informative but a bit abstract — "patents per firm" is more intuitive for a marketing audience. The cleanest way to translate the coefficient into an additional-patents number is **counterfactual prediction**: ask the fitted model, for every firm in the dataset, "what would we predict if this firm were *not* a customer? And what would we predict if it *were* a customer?" Then average the difference.
 
 ```{python}
@@ -426,7 +430,7 @@ print(f"Average treatment effect on the treated population:  +{avg_effect:.3f} p
 #| label: fig-counterfactual
 #| fig-cap: "Distribution of firm-level predicted patent counts under the two counterfactuals. The whole distribution shifts right when every firm is set to customer status."
 
-fig, ax = plt.subplots(figsize=(9, 4))
+fig, ax = plt.subplots(figsize=(7.5, 3.5))
 bins = np.linspace(0, max(y0.max(), y1.max()) + 0.5, 40)
 ax.hist(y0, bins=bins, color=C_NONCUSTOMER, alpha=0.7, edgecolor="white",
         label=f"All non-customer (mean {y0.mean():.2f})")
